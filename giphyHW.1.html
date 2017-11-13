@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Landmarks GIFs</title>
+</head>
+
+<body>
+    <!-- <button id="eiffel-tower">Eiffel Tower Button</button> -->
+
+    <!-- New buttons dumped here  -->
+    <div id="buttons"></div>
+
+    <div id="images">
+    </div>
+
+    <div id="rating"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        // Initial array of items
+        var topics = ["Eiffel Tower", "Empire State Building", "Golden Gate Bridge"];
+
+        // since we want to grab #buttons, we need to wait for page to finish loading
+        $(document).ready(function() {
+            var buttons = $('#buttons');
+
+            // This does not need to be inside displayGifs, it can be its own function
+            function newButtons() {
+
+                buttons.empty();
+
+                // Loops through the array
+                for(var i = 0; i < topics.length; i++) {
+
+                    // dynamicaly generates buttons for each item in the array
+                    var a = $("<button>");
+
+                    // Added a data-attribute
+                    a.attr("data-name", topics[i]);
+
+                    // Add a class so we can setup a click handler
+                    a.attr("class", "topic-button");
+
+                    // Provided the initial button text
+                    a.text(topics[i]);
+
+                    // Added the button to the buttons-view div
+                    buttons.append(a);
+                }
+            }
+
+            // create initial set of buttons when page loads
+            newButtons();
+
+            // since the topic buttons are dynamic, listen on the document
+            $(document).on("click", ".topic-button", function() {
+                var landmarks = $(this).attr("data-name");
+                var queryURL = encodeURI("https://api.giphy.com/v1/gifs/search?api_key=dc6zaTOxFJmzC&q=" + landmarks + "&limit=10");
+
+                // Perfoming an AJAX GET request to our queryURL
+                $.ajax({ url: queryURL, method: "GET" })
+
+                    // After the data from the AJAX request comes back .done(function(response) {
+                    .done(function(response) {
+                        console.log(queryURL);
+                        console.log(response);
+
+                        //for loop
+                        for(var i = 0; i < response.data.length; i++) {
+
+                            // Saving the image_original_url property
+                            var imageUrl = response.data[i].images.original.url;
+
+                            var imageStill = response.data[i].images.original_still.url;
+
+                            // Creating and storing an image tag
+                            var newImage = $("<img>");
+
+                            console.log(imageUrl);
+
+                            newImage.attr("src", imageUrl);
+                            newImage.attr("alt", "new image");
+                            newImage.attr("class", "giphy-image");
+                            newImage.attr("data-still", imageStill);
+                            newImage.attr("data-animate", imageUrl);
+                            newImage.attr("title", response.data[i].rating);
+
+                            // Prepending the newImage to the images div
+
+                            //$("#images");
+
+                            // Display rating
+                            $("#rating").prepend("<p>" + "Rated: " + response.data[i].rating + "</p>").prepend(newImage);
+                        }
+
+                    });
+            });
+
+            // since the giphy images are dynamic, listen on the document
+            $(document).on("click", ".giphy-image", function() {
+                // toggle animated/still here
+
+                // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+                var state = $(this).attr("data-state");
+                // If the clicked image's state is still, update its src attribute to what its data-animate value is.
+                // Then, set the image's data-state to animate
+                // Else set src to the data-still value
+                if(state === "still") {
+                    $(this).attr("src", $(this).attr("data-animate"));
+                    $(this).attr("data-state", "animate");
+                }
+                else {
+                    $(this).attr("src", $(this).attr("data-still"));
+                    $(this).attr("data-state", "still");
+                }
+            });
+        });
+    </script>
+
+    </script>
+</body>
+
+</html>
