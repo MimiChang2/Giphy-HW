@@ -10,6 +10,16 @@
     <!-- <button id="eiffel-tower">Eiffel Tower Button</button> -->
 
     <!-- New buttons dumped here  -->
+    <div id="new-buttons"></div>
+
+    <form id="gif-form">
+        <label for="gif-input">Add a New Landmark</label>
+        <input type="text" id="gif-input"><br>
+
+        <button id="add-pic" type="submit">Add New Landmark</button>
+    </form>
+
+
     <div id="buttons"></div>
 
     <div id="images">
@@ -21,6 +31,7 @@
     <script type="text/javascript">
         // Initial array of items
         var topics = ["Eiffel Tower", "Empire State Building", "Golden Gate Bridge"];
+
 
         // since we want to grab #buttons, we need to wait for page to finish loading
         $(document).ready(function() {
@@ -52,6 +63,20 @@
             }
 
             // create initial set of buttons when page loads
+            newButtons();
+
+            $("#add-pic").on("click", function(event) {
+                event.preventDefault();
+                var userAddedButton = $("#gif-input").val().trim();
+                topics.push(userAddedButton);
+                newButtons();
+
+            });
+
+            // Adding click event listeners to all elements with a class of "movie"
+            $(document).on("click", ".landmarks", newButtons);
+
+            // Calling the renderButtons function to display the intial buttons
             newButtons();
 
             // since the topic buttons are dynamic, listen on the document
